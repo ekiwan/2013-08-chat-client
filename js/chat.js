@@ -1,11 +1,12 @@
-var getMessages = function(){
-    $.ajax('https://api.parse.com/1/classes/messages?order=-createdAt', {
+var getMessages = function(roomName){
+    roomName = roomName || 'messages';
+    $.ajax('https://api.parse.com/1/classes/' + roomName + '?order=-createdAt', {
       contentType: 'application/json',
       success: function(data){
         $('#main h2').remove();
         $('#main p').remove();
         for (var i = 0; i < 10; i++){
-          if(data.results[i].username === undefined){
+          if(data.results[i].username === undefined && data.results[i] !== sessionStorage.username){
             data.results[i].username = "Guest";
           }
           if(sessionStorage[data.results[i].username] === "true"){
@@ -16,7 +17,7 @@ var getMessages = function(){
           $('#main a:last').text(data.results[i].username);
           $('#main').append("<p class='message'>");
           $('#main p:last').text(data.results[i].text);
-          // console.log(data);
+
         }
       },
       error: function(data) {
@@ -31,10 +32,12 @@ var refreshMessages = function(){
   }, 5000);
 };
 
-var sendMessage = function(string){
-  var userNameEncode = window.location.search.substr(window.location.search.indexOf("=") + 1);
-  var userNameString = decodeURIComponent(userNameEncode);
-  $.ajax('https://api.parse.com/1/classes/messages',{
+var sendMessage = function(string, roomName){
+  // var userNameEncode = window.location.search.substr(window.location.search.indexOf("=") + 1);
+  // var userNameString = decodeURIComponent(userNameEncode);
+  var userNameString = sessionStorage.username;
+  var currentRoom = roomName || "messages";
+  $.ajax('https://api.parse.com/1/classes/' + currentRoom,{
     type: "POST",
     contentType: 'application/json',
     data: JSON.stringify({username: userNameString, text: string})
@@ -45,7 +48,7 @@ var createUser = function(username, password) {
   $.ajax('https://api.parse.com/1/users',{
     type: "POST",
     contentType: 'application/json',
-    data: JSON.stringify({username: username, password: password, friendList: "{}" })
+    data: JSON.stringify({username: username, password: password, friendList: {} })
   });
 };
 
@@ -54,15 +57,13 @@ var loginUser = function(username, password) {
     type: "GET",
     contentType: 'application/json',
     success: function(data){
-      console.log(data);
-      // console.log(serverFriends);
       for(var key in data.friendList){
         // var sessionFriends = jQuery.parseJSON(sessionStorage);
-        console.log(key);
         sessionStorage[key] = true;
       }
       sessionStorage.authToken = data.sessionToken;
       sessionStorage.userId = data.objectId;
+      sessionStorage.username = data.username;
     }
   });
 };
@@ -71,7 +72,6 @@ var loginUser = function(username, password) {
 var addFriend = function(friendName) {
   sessionStorage.setItem(friendName, true);
   friends = sessionStorage;
-  console.log(typeof friends);
   console.log('https://api.parse.com/1/users/' + sessionStorage.userId);
   $.ajax('https://api.parse.com/1/users/' + sessionStorage.userId, {
     type: "PUT",
