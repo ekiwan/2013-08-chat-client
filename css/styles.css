@@ -38,3 +38,11 @@ body {
     color: green;
     line-height: 13px;
 }
+
+.username{
+    color: blue;
+}
+
+.message{
+    display: inline;
+}
