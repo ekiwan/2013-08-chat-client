@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chat with JSON!</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="vendor/jquery/jquery-1.9.1.js"></script>
+    <script src="js/underscore.js"></script>
+    <script src="js/backbone.js"></script>
+    <script src="js/setup.js"></script>
+    <script src="js/backboneChat.js"></script>
+  </head>
+  <body>
+    <form>
+      <input type="text"></input>
+    </form>
+    <script>
+        $(document).ready(function(){
+          $('form').on('submit', function(e){
+            e.preventDefault();
+            var newMessage = new Message($('input').val())
+            var newMessageView = new MessageView({model: newMessage})
+            $('input').val('');
+          })
+          Messages.getMessages()
+        })
+    </script>
+  </body>
+</html>
