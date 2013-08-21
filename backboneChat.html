@@ -19,11 +19,18 @@
         $(document).ready(function(){
           $('form').on('submit', function(e){
             e.preventDefault();
-            var newMessage = new Message($('input').val())
-            var newMessageView = new MessageView({model: newMessage})
+            var message = $('input').val();
+            $.ajax('https://api.parse.com/1/classes/messages', {
+              type: "POST",
+              contentType: "application/json",
+              data: JSON.stringify({text: message})
+            });
             $('input').val('');
           })
-          Messages.getMessages()
+          Messages.getMessages();
+          setInterval(function(){
+            Messages.getMessages()
+          }, 5000);
         })
     </script>
   </body>

@@ -2,6 +2,7 @@ var Message = Backbone.Model.extend({
   initialize: function(text){
     this.set({text: text});
   }
+
 });
 
 
@@ -25,11 +26,15 @@ Messages.getMessages = function(){
     type: "GET",
     contentType: "application/json",
     success: function(data){
-      console.log("hello", data.results);
+      $('body div').remove();
+      //console.log("hello", data.results);
       _.each(data.results, function(result){
         var message = new Message(result.text);
         var messageView = new MessageView({model: message});
       });
     }
   });
-}; 
+};
+
+
+
